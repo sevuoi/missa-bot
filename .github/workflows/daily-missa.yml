@@ -1,0 +1,21 @@
+name: Daily Missa Post
+
+on:
+  schedule:
+    - cron: '0 21 * * *'  # 매일 오전 6시 (한국시간)
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  post-missa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Discord
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          TODAY=$(TZ='Asia/Seoul' date +%Y%m%d)
+          MISSA_URL="https://missa.cbck.or.kr/DailyMissa/${TODAY}"
+          
+          curl -H "Content-Type: application/json" \
+               -d "{\"content\": \"📖 오늘의 미사: ${MISSA_URL}\"}" \
+               $WEBHOOK_URL
